@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Juros - GR Gestão</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f4f4f4;
+            padding: 20px;
+            margin: 0;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 350px;
+            margin: auto;
+            box-sizing: border-box;
+        }
+        h2 {
+            color: #0044cc;
+        }
+        input, select, button {
+            width: 100%;
+            margin: 10px 0;
+            padding: 12px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            background: #0044cc;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+        button:hover {
+            background: #002a80;
+            transform: scale(1.05);
+        }
+        #resultado {
+            font-weight: bold;
+            margin-top: 15px;
+            color: #333;
+            padding: 10px;
+            border-radius: 5px;
+            background: #e0e0e0;
+            word-wrap: break-word;
+            margin-top: 20px;
+        }
+        .footer {
+            margin-top: 15px;
+            font-size: 14px;
+            color: #777;
+        }
+
+        /* Estilos para dispositivos móveis */
+        @media (max-width: 600px) {
+            h2 {
+                font-size: 20px;
+            }
+            input, select, button {
+                font-size: 14px;
+                padding: 10px;
+            }
+            #resultado {
+                font-size: 16px;
+                padding: 12px;
+                margin-top: 20px;
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>Calculadora de Juros - GR Gestão</h2>
+        
+        <label>Valor Principal (R$):</label>
+        <input type="text" id="valor" placeholder="Ex: 2.544,03" oninput="formatarValor(this)">
+
+        <label>Taxa de Juros (% ao mês):</label>
+        <input type="text" id="taxa" placeholder="Ex: 2,5" oninput="formatarValor(this)">
+
+        <label>Data Inicial:</label>
+        <input type="date" id="dataInicial">
+
+        <label>Tipo de Juros:</label>
+        <select id="tipoJuros">
+            <option value="simples">Juros Simples</option>
+            <option value="compostos">Juros Compostos</option>
+        </select>
+
+        <button onclick="calcularJuros()">Calcular</button>
+
+        <div id="resultado"></div>
+
+        <div class="footer">Desenvolvido por: Lucas Oliveira</div>
+    </div>
+
+    <script>
+        function formatarValor(campo) {
+            campo.value = campo.value.replace(/[^0-9,]/g, ''); // Permite apenas números e vírgula
+        }
+
+        function calcularJuros() {
+            let valorStr = document.getElementById("valor").value;
+            let taxaStr = document.getElementById("taxa").value;
+            let dataInicial = new Date(document.getElementById("dataInicial").value);
+            let tipoJuros = document.getElementById("tipoJuros").value;
+            let hoje = new Date();
+
+            // Converte valores formatados para número
+            let valor = parseFloat(valorStr.replace(/\./g, '').replace(',', '.'));
+            let taxa = parseFloat(taxaStr.replace(',', '.')) / 100;
+
+            if (isNaN(valor) || isNaN(taxa) || isNaN(dataInicial.getTime())) {
+                document.getElementById("resultado").innerHTML = "⚠️ Preencha todos os campos corretamente!";
+                return;
+            }
+
+            // Calcula a diferença de meses exata
+            let meses = ((hoje.getFullYear() - dataInicial.getFullYear()) * 12) + hoje.getMonth() - dataInicial.getMonth();
+            if (hoje.getDate() < dataInicial.getDate()) meses--; // Ajuste caso a data atual não tenha completado o mês
+
+            let valorFinal;
+            if (tipoJuros === "simples") {
+                valorFinal = valor * (1 + (taxa * meses));
+            } else {
+                valorFinal = valor * Math.pow((1 + taxa), meses);
+            }
+
+            // Exibe resultado
+            document.getElementById("resultado").innerHTML = `
+                <p>📅 Período calculado: <strong>${meses} meses</strong></p>
+                <p>💰 Valor final com juros ${tipoJuros}: <strong>R$ ${valorFinal.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</strong></p>
+            `;
+        }
+    </script>
+
+</body>
+</html>
